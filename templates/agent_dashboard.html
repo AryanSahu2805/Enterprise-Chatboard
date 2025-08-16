@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - Enterprise Support System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --secondary-color: #20c997;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --shadow: 0 5px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--light-color);
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .agent-info {
+            text-align: right;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .agent-role {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 25px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--dark-color);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex: 1;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .sidebar.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>
+                <i class="fas fa-headset"></i>
+                Agent Dashboard
+            </h1>
+            <div class="header-right">
+                <div class="agent-info">
+                    <div class="agent-name">{{ current_user.username }}</div>
+                    <div class="agent-role">Support Agent</div>
+                </div>
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="/agent/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Navigation</h2>
+                <p class="sidebar-subtitle">Manage your support activities</p>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showTab('overview')">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Overview
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('active-issues')">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Active Issues
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('chat-interface')">
+                        <i class="fas fa-comments"></i>
+                        Chat Interface
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('performance')">
+                        <i class="fas fa-chart-line"></i>
+                        Performance
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('knowledge-base')">
+                        <i class="fas fa-book"></i>
+                        Knowledge Base
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('quick-actions')">
+                        <i class="fas fa-bolt"></i>
+                        Quick Actions
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard Overview</h1>
+                    <p class="page-subtitle">Welcome back! Here's your current status and recent activities</p>
+                </div>
+                
+                <!-- Overview content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-tachometer-alt" style="font-size: 4rem; margin-bottom: 20px; display: block; color: var(--primary-color);"></i>
+                    <h3>Overview Tab</h3>
+                    <p>This tab will show your dashboard overview with statistics and recent activities.</p>
+                </div>
+            </div>
+            
+            <!-- Active Issues Tab -->
+            <div id="active-issues" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Active Issues</h1>
+                    <p class="page-subtitle">Manage and resolve escalated customer issues</p>
+                </div>
+                
+                <!-- Active Issues content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #ffc107;"></i>
+                    <h3>Active Issues Tab</h3>
+                    <p>This tab will show all your active escalated issues with management tools.</p>
+                </div>
+            </div>
+            
+            <!-- Chat Interface Tab -->
+            <div id="chat-interface" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Chat Interface</h1>
+                    <p class="page-subtitle">Communicate with customers and resolve their issues</p>
+                </div>
+                
+                <!-- Chat Interface content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-comments" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #17a2b8;"></i>
+                    <h3>Chat Interface Tab</h3>
+                    <p>This tab will provide the chat interface for customer communication.</p>
+                </div>
+            </div>
+            
+            <!-- Performance Tab -->
+            <div id="performance" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Performance Metrics</h1>
+                    <p class="page-subtitle">Track your individual performance and achievements</p>
+                </div>
+                
+                <!-- Performance content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-chart-line" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #28a745;"></i>
+                    <h3>Performance Tab</h3>
+                    <p>This tab will display your performance metrics and achievements.</p>
+                </div>
+            </div>
+            
+            <!-- Knowledge Base Tab -->
+            <div id="knowledge-base" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Knowledge Base</h1>
+                    <p class="page-subtitle">Access resources and solutions for common issues</p>
+                </div>
+                
+                <!-- Knowledge Base content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-book" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #6f42c1;"></i>
+                    <h3>Knowledge Base Tab</h3>
+                    <p>This tab will provide access to knowledge resources and solutions.</p>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Tab -->
+            <div id="quick-actions" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Quick Actions</h1>
+                    <p class="page-subtitle">Common tasks and shortcuts for efficient workflow</p>
+                </div>
+                
+                <!-- Quick Actions content will be implemented next -->
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-bolt" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #fd7e14;"></i>
+                    <h3>Quick Actions Tab</h3>
+                    <p>This tab will provide quick access to common tasks and shortcuts.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentTab = 'overview';
+        
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked nav link
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+            
+            // Load tab-specific data
+            loadTabData(tabName);
+        }
+        
+        // Load data for specific tabs
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'overview':
+                    // Will implement next
+                    break;
+                case 'active-issues':
+                    // Will implement next
+                    break;
+                case 'chat-interface':
+                    // Will implement next
+                    break;
+                case 'performance':
+                    // Will implement next
+                    break;
+                case 'knowledge-base':
+                    // Will implement next
+                    break;
+                case 'quick-actions':
+                    // Will implement next
+                    break;
+            }
+        }
+        
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial tab data
+            loadTabData(currentTab);
+        });
+    </script>
+</body>
+</html>
