@@ -51,33 +51,305 @@ A comprehensive, enterprise-grade customer support system that combines AI-power
 - **Empty States**: Helpful messages when no data is available
 - **Modern UI Components**: Professional dashboard design with Chart.js integration
 
-## 🏗️ **Architecture & Technology Stack**
+## 🏗️ **System Architecture & Technology Stack**
 
-### **Backend Framework**
-- **Flask**: Python web framework with modular architecture
-- **Flask-SocketIO**: Real-time bidirectional communication
-- **Flask-Login**: User session management and authentication
-- **Flask-Bcrypt**: Secure password hashing and verification
-- **Flask-CORS**: Cross-origin resource sharing support
+### **🏛️ High-Level Architecture**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Enterprise AI Chatbot System                 │
+├─────────────────────────────────────────────────────────────────┤
+│  Frontend Layer (Client Interface)                             │
+│  ├── Public Client Interface (/)                               │
+│  ├── Agent Dashboard (/agent)                                  │
+│  └── Admin Dashboard (/admin)                                  │
+├─────────────────────────────────────────────────────────────────┤
+│  Application Layer (Flask Backend)                             │
+│  ├── Web Server (Flask + SocketIO)                            │
+│  ├── Authentication & Authorization                            │
+│  ├── AI Chat Engine (OpenAI Integration)                      │
+│  ├── Agent Management System                                   │
+│  └── Real-time Communication Hub                               │
+├─────────────────────────────────────────────────────────────────┤
+│  Data Layer (Hybrid Database)                                  │
+│  ├── SQLite (Primary: Chat, Users, Sessions)                  │
+│  ├── MongoDB (Optional: Agent Management)                     │
+│  └── File System (Logs, Configurations)                       │
+├─────────────────────────────────────────────────────────────────┤
+│  External Services                                             │
+│  ├── OpenAI API (AI Responses)                                 │
+│  ├── MongoDB Atlas (Cloud Database)                            │
+│  └── WebSocket Server (Real-time Updates)                     │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### **Database Architecture**
-- **SQLite**: Primary database for chat sessions, messages, users, and escalations
-- **MongoDB Atlas**: Cloud-hosted NoSQL database for agent management (optional)
-- **Hybrid Approach**: Combines SQLite reliability with MongoDB scalability
-- **Real-time Updates**: Live data synchronization across all interfaces
+### **🔧 Backend Framework Architecture**
+- **Flask Core**: Python web framework with modular blueprint architecture
+- **Flask-SocketIO**: Real-time bidirectional communication for live chat
+- **Flask-Login**: User session management with custom authentication handlers
+- **Flask-Bcrypt**: Secure password hashing and verification system
+- **Flask-CORS**: Cross-origin resource sharing for API accessibility
+- **Blueprint Pattern**: Modular route organization for scalability
 
-### **Frontend Technologies**
-- **HTML5/CSS3**: Modern, responsive design with CSS Grid and Flexbox
-- **JavaScript (ES6+)**: Interactive client-side functionality
-- **Socket.IO Client**: Real-time communication with backend
-- **Chart.js**: Data visualization and analytics charts
+### **🗄️ Database Architecture & Schema**
+
+#### **SQLite Database (Primary)**
+```sql
+-- Core User Management
+users:
+  - id (UUID, Primary Key)
+  - username (VARCHAR, Unique)
+  - email (VARCHAR, Unique)
+  - password_hash (VARCHAR, Bcrypt)
+  - role (ENUM: super_admin, agent)
+  - created_at (DATETIME)
+  - last_login (DATETIME)
+  - total_working_hours (REAL, Default: 0)
+
+-- Chat Session Management
+sessions:
+  - session_id (UUID, Primary Key)
+  - start_time (DATETIME)
+  - last_activity (DATETIME)
+  - context (JSON)
+  - status (ENUM: open, in_progress, resolved, escalated)
+  - escalated_at (DATETIME, Nullable)
+  - assigned_agent (UUID, Foreign Key to users.id)
+  - satisfaction_score (INTEGER, Nullable)
+  - user_id (UUID, Nullable)
+
+-- Message Storage
+messages:
+  - id (UUID, Primary Key)
+  - session_id (UUID, Foreign Key to sessions.session_id)
+  - content (TEXT)
+  - sender (VARCHAR: 'user', 'bot', 'agent_{id}')
+  - message_type (ENUM: text, image, file, system, escalation)
+  - timestamp (DATETIME)
+  - confidence (REAL, Nullable)
+  - intent (VARCHAR, Nullable)
+  - is_escalated (BOOLEAN, Default: false)
+
+-- Escalation Tracking
+escalations:
+  - id (UUID, Primary Key)
+  - session_id (UUID, Foreign Key to sessions.session_id)
+  - reason (TEXT)
+  - ai_confidence (REAL)
+  - timestamp (DATETIME)
+  - status (ENUM: open, in_progress, resolved, escalated)
+  - assigned_agent (UUID, Foreign Key to users.id)
+
+-- Agent Session Tracking
+agent_sessions:
+  - id (INTEGER, Primary Key, Auto-increment)
+  - agent_id (UUID, Foreign Key to users.id)
+  - start_time (DATETIME)
+  - end_time (DATETIME, Nullable)
+  - duration_minutes (REAL, Nullable)
+  - status (ENUM: online, offline)
+```
+
+#### **MongoDB Collections (Optional)**
+```javascript
+// Agent Management & Performance
+agents: {
+  _id: ObjectId,
+  user_id: UUID,
+  first_name: String,
+  last_name: String,
+  skills: [String],
+  hourly_rate: Number,
+  availability: {
+    status: String, // available, busy, offline
+    working_hours: {
+      start: String,
+      end: String
+    }
+  },
+  performance_metrics: {
+    avg_response_time: Number,
+    satisfaction_score: Number,
+    total_resolved_issues: Number
+  }
+}
+
+// Customer Feedback System
+customer_feedback: {
+  _id: ObjectId,
+  session_id: UUID,
+  agent_id: UUID,
+  rating: Number, // 1-5 stars
+  feedback_type: String, // positive, negative, neutral
+  comment: String,
+  timestamp: Date,
+  customer_satisfaction: Number
+}
+
+// System Analytics & Logs
+system_logs: {
+  _id: ObjectId,
+  timestamp: Date,
+  level: String, // info, warning, error
+  component: String,
+  message: String,
+  user_id: UUID,
+  session_id: UUID,
+  metadata: Object
+}
+```
+
+### **🌐 Frontend Architecture & Technologies**
+
+#### **Component Structure**
+```
+Frontend/
+├── Public Client Interface
+│   ├── Chat Interface (Real-time)
+│   ├── Message History
+│   ├── Feedback System
+│   └── Responsive Design
+├── Agent Dashboard
+│   ├── Overview Dashboard
+│   ├── Active Issues Management
+│   ├── Performance Metrics
+│   ├── Status Toggle System
+│   └── Working Hours Timer
+└── Admin Dashboard
+    ├── Analytics Overview
+    ├── Agent Management
+    ├── Performance Reports
+    ├── System Monitoring
+    └── User Administration
+```
+
+#### **Technology Stack**
+- **HTML5**: Semantic markup with accessibility features
+- **CSS3**: 
+  - Grid Layout for complex dashboard arrangements
+  - Flexbox for responsive component layouts
+  - CSS Variables for consistent theming
+  - Animations and transitions for enhanced UX
+- **JavaScript (ES6+)**:
+  - Modern async/await patterns
+  - Event-driven architecture
+  - Module-based code organization
+  - Real-time data binding
+- **Socket.IO Client**: WebSocket communication for live updates
+- **Chart.js**: Interactive data visualization
 - **Responsive Design**: Mobile-first approach with progressive enhancement
 
-### **AI & Machine Learning**
-- **OpenAI GPT-3.5-turbo**: Natural language processing and response generation
-- **Intent Recognition**: Rule-based customer intent classification
-- **Confidence Scoring**: AI response confidence assessment for escalation decisions
-- **Fallback Mechanisms**: Graceful degradation when AI services are unavailable
+### **🤖 AI & Machine Learning Architecture**
+
+#### **OpenAI Integration Pipeline**
+```
+User Input → Intent Classification → AI Processing → Response Generation → Confidence Check → Escalation Decision
+     ↓              ↓                ↓              ↓                ↓              ↓
+  Text Input   Rule-based      GPT-3.5-turbo   AI Response    Score < 0.7?   Human Agent
+              Classification      API Call       Generation      Yes → Escalate
+```
+
+#### **Intent Recognition System**
+- **Keyword-based Classification**: Predefined patterns for common queries
+- **Confidence Scoring**: AI response reliability assessment
+- **Escalation Triggers**: Automatic routing to human agents
+- **Fallback Mechanisms**: Rule-based responses when AI fails
+
+#### **Response Processing**
+- **Context Preservation**: Maintains conversation history
+- **Dynamic Escalation**: Seamless handoff to human agents
+- **Response Optimization**: Tailored responses based on user context
+- **Error Handling**: Graceful degradation with helpful fallbacks
+
+### **🔐 Security Architecture**
+
+#### **Authentication & Authorization**
+```
+User Request → Session Validation → Role Check → Resource Access → Audit Logging
+     ↓              ↓              ↓           ↓              ↓
+  Login Form   Flask-Login    UserRole     Endpoint      Database Log
+              Session Mgmt    Validation   Permission    Activity Track
+```
+
+#### **Security Layers**
+- **Password Security**: Bcrypt hashing with salt
+- **Session Management**: Secure Flask-Login implementation
+- **Role-based Access Control**: Granular permissions system
+- **Input Validation**: Comprehensive sanitization and validation
+- **CSRF Protection**: Built-in Flask security features
+- **Rate Limiting**: API abuse prevention
+
+### **📡 Real-time Communication Architecture**
+
+#### **WebSocket Implementation**
+```
+Client ←→ Socket.IO Client ←→ Flask-SocketIO ←→ Event Handlers ←→ Database Updates
+   ↓              ↓                ↓              ↓              ↓
+Real-time    Connection      Message Routing   Business Logic   Data Persistence
+Updates      Management      & Broadcasting     Execution        & Broadcasting
+```
+
+#### **Event Flow**
+1. **Connection Establishment**: Client connects to Socket.IO server
+2. **Event Broadcasting**: Real-time updates across all connected clients
+3. **Message Routing**: Intelligent message distribution
+4. **State Synchronization**: Consistent data across all interfaces
+5. **Error Handling**: Graceful connection recovery
+
+### **🚀 Scalability & Performance Architecture**
+
+#### **Horizontal Scaling Considerations**
+- **Stateless Design**: Session data stored in database, not memory
+- **Load Balancer Ready**: Multiple Flask instances support
+- **Database Optimization**: Indexed queries and connection pooling
+- **Caching Strategy**: Redis integration ready for performance boost
+- **Microservices Ready**: Modular architecture for service decomposition
+
+#### **Performance Optimizations**
+- **Database Indexing**: Optimized query performance
+- **Connection Pooling**: Efficient database connection management
+- **Async Processing**: Non-blocking operations for better responsiveness
+- **Resource Management**: Efficient memory and CPU utilization
+- **Monitoring & Metrics**: Real-time performance tracking
+
+### **🔧 Deployment Architecture**
+
+#### **Development Environment**
+```
+Local Development → Virtual Environment → Flask Debug Mode → Hot Reload
+       ↓                ↓                ↓              ↓
+   Source Code    Python Dependencies   Development    Auto-restart
+   Management     Isolation            Features       on Changes
+```
+
+#### **Production Environment**
+```
+Load Balancer → Web Server (Gunicorn) → Flask App → Database Cluster
+      ↓              ↓                    ↓           ↓
+  SSL/TLS        Process Mgmt        Application   Data Storage
+  Termination    & Scaling           Logic         & Backup
+```
+
+#### **Containerization Ready**
+- **Docker Support**: Containerized deployment
+- **Environment Variables**: Configuration management
+- **Health Checks**: Application monitoring
+- **Logging**: Centralized log management
+- **Backup Strategies**: Data protection and recovery
+
+### **📊 Monitoring & Observability**
+
+#### **System Health Monitoring**
+- **Application Metrics**: Response times, error rates, throughput
+- **Database Performance**: Query execution times, connection status
+- **External Service Health**: OpenAI API, MongoDB connectivity
+- **User Experience Metrics**: Page load times, interaction success rates
+
+#### **Logging Architecture**
+- **Structured Logging**: JSON-formatted logs for easy parsing
+- **Log Levels**: Debug, Info, Warning, Error, Critical
+- **Centralized Logging**: Central log aggregation and analysis
+- **Audit Trails**: Complete user action tracking
+- **Performance Monitoring**: Real-time system health indicators
 
 ## 🚀 **Quick Start Guide**
 
