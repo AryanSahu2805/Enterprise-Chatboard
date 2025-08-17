@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Dashboard - Enterprise Support System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #28a745;
@@ -55,6 +56,71 @@
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+        
+        .status-toggle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-btn .dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.5s ease;
+        }
+        
+        .status-btn.online .dot {
+            transform: translateX(40px);
+        }
+        
+        .status-btn.offline .dot {
+            transform: translateX(0);
+        }
+        
+        .status-btn.online {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status-btn.offline {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .status-btn.busy {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .status-info {
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
         }
         
         .agent-info {
@@ -237,6 +303,604 @@
                 display: block;
             }
         }
+        
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: 300px;
+            position: relative;
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+        
+        /* Recent Escalations */
+        .recent-escalations {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .recent-escalations h3 {
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+        
+        .escalations-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .escalation-item {
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        
+        .escalation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .escalation-session {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .escalation-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-open {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-in-progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .escalation-reason {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .escalation-time {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        /* Active Issues */
+        .issues-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .issues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        
+        .refresh-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .issues-table-container {
+            overflow-x: auto;
+        }
+        
+        .issues-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .issues-table th,
+        .issues-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .issues-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .issues-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Performance Stats */
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .perf-stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition);
+        }
+        
+        .perf-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .perf-stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .perf-stat-content {
+            flex: 1;
+        }
+        
+        .perf-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .perf-stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .performance-charts {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .perf-chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 1.2rem;
+        }
+        
+        /* Chart Loading States */
+        .chart-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .chart-loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--primary-color);
+        }
+        
+        .chart-loading span {
+            font-size: 1rem;
+        }
+        
+        /* Loading States */
+        .loading-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .loading-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--primary-color);
+        }
+        
+        .loading-placeholder span {
+            font-size: 1rem;
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #ccc;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #999;
+        }
+        
+        .empty-state p {
+            color: #999;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .performance-stats {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .issues-table-container {
+                font-size: 0.9rem;
+            }
+            
+            .issues-table th,
+            .issues-table td {
+                padding: 8px;
+            }
+        }
+        
+        /* Customer Feedback Tab Styles */
+        .feedback-overview {
+            margin-bottom: 30px;
+        }
+        
+        .feedback-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feedback-stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+        
+        .feedback-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .feedback-stat-card .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .feedback-stat-card .stat-content {
+            flex: 1;
+        }
+        
+        .feedback-stat-card .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .feedback-stat-card .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .feedback-list-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .feedback-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .feedback-list-header h3 {
+            color: var(--dark-color);
+            margin: 0;
+        }
+        
+        .feedback-filters select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .feedback-filters select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .feedback-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .feedback-item {
+            background: var(--light-color);
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+        
+        .feedback-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .feedback-rating {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .feedback-star {
+            color: #ffc107;
+            font-size: 1.1rem;
+        }
+        
+        .feedback-star.empty {
+            color: #ddd;
+        }
+        
+        .feedback-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .feedback-type {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .feedback-comment {
+            color: #333;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+        
+        .feedback-session {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification-info {
+            background: #17a2b8;
+        }
+        
+        .notification-success {
+            background: #28a745;
+        }
+        
+        .notification-error {
+            background: #dc3545;
+        }
+        
+        .notification button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -248,6 +912,15 @@
                 Agent Dashboard
             </h1>
             <div class="header-right">
+                <div class="status-toggle">
+                    <button id="statusToggle" class="status-btn offline">
+                        <div class="dot"></div>
+                        <span id="statusText">Offline</span>
+                    </button>
+                    <div class="status-info">
+                        <small id="statusTime">Not working</small>
+                    </div>
+                </div>
                 <div class="agent-info">
                     <div class="agent-name">{{ current_user.username }}</div>
                     <div class="agent-role">Support Agent</div>
@@ -306,6 +979,12 @@
                         Quick Actions
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTab('feedback')">
+                        <i class="fas fa-star"></i>
+                        Customer Feedback
+                    </a>
+                </div>
             </nav>
         </aside>
         
@@ -318,11 +997,79 @@
                     <p class="page-subtitle">Welcome back! Here's your current status and recent activities</p>
                 </div>
                 
-                <!-- Overview content will be implemented next -->
-                <div style="text-align: center; padding: 60px 20px; color: #666;">
-                    <i class="fas fa-tachometer-alt" style="font-size: 4rem; margin-bottom: 20px; display: block; color: var(--primary-color);"></i>
-                    <h3>Overview Tab</h3>
-                    <p>This tab will show your dashboard overview with statistics and recent activities.</p>
+                <!-- Real-time Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="activeEscalations">0</div>
+                            <div class="stat-label">Active Issues</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="weeklyEscalations">0</div>
+                            <div class="stat-label">This Week</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="monthlyEscalations">0</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="avgSatisfaction">Loading...</div>
+                            <div class="stat-label">Avg Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Escalation Activity (Last 7 Days)</h3>
+                        <div id="escalationChartLoading" class="chart-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading chart data...</span>
+                        </div>
+                        <canvas id="escalationChart" style="display: none; width: 100% !important; height: 100% !important;"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Resolution Rate Trend</h3>
+                        <div id="resolutionChartLoading" class="chart-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading chart data...</span>
+                        </div>
+                        <canvas id="resolutionChart" style="display: none; width: 100% !important; height: 100% !important;"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Recent Escalations -->
+                <div class="recent-escalations">
+                    <h3>Recent Escalations</h3>
+                    <div class="escalations-list" id="recentEscalationsList">
+                        <div class="loading-placeholder">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading recent escalations...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -333,11 +1080,37 @@
                     <p class="page-subtitle">Manage and resolve escalated customer issues</p>
                 </div>
                 
-                <!-- Active Issues content will be implemented next -->
-                <div style="text-align: center; padding: 60px 20px; color: #666;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #ffc107;"></i>
-                    <h3>Active Issues Tab</h3>
-                    <p>This tab will show all your active escalated issues with management tools.</p>
+                <!-- Active Issues Table -->
+                <div class="issues-container">
+                    <div class="issues-header">
+                        <h3>Current Active Issues</h3>
+                        <button class="refresh-btn" onclick="loadActiveIssues()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="issues-table-container">
+                        <table class="issues-table">
+                            <thead>
+                                <tr>
+                                    <th>Session ID</th>
+                                    <th>Reason</th>
+                                    <th>AI Confidence</th>
+                                    <th>Timestamp</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeIssuesTable">
+                                <tr>
+                                    <td colspan="6" class="loading-placeholder">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Loading active issues...</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
@@ -363,11 +1136,59 @@
                     <p class="page-subtitle">Track your individual performance and achievements</p>
                 </div>
                 
-                <!-- Performance content will be implemented next -->
-                <div style="text-align: center; padding: 60px 20px; color: #666;">
-                    <i class="fas fa-chart-line" style="font-size: 4rem; margin-bottom: 20px; display: block; color: #28a745;"></i>
-                    <h3>Performance Tab</h3>
-                    <p>This tab will display your performance metrics and achievements.</p>
+                <!-- Performance Statistics -->
+                <div class="performance-stats">
+                    <div class="perf-stat-card">
+                        <div class="perf-stat-icon">
+                            <i class="fas fa-message"></i>
+                        </div>
+                        <div class="perf-stat-content">
+                            <div class="perf-stat-number" id="totalMessages">0</div>
+                            <div class="perf-stat-label">Messages Sent Today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="perf-stat-card">
+                        <div class="perf-stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="perf-stat-content">
+                            <div class="perf-stat-number" id="avgResponseTime">0</div>
+                            <div class="perf-stat-label">Avg Response Time (min)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="perf-stat-card">
+                        <div class="perf-stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="perf-stat-content">
+                            <div class="perf-stat-number" id="resolutionRate">0%</div>
+                            <div class="perf-stat-label">Resolution Rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="perf-stat-card">
+                        <div class="perf-stat-icon">
+                            <i class="fas fa-thumbs-up"></i>
+                        </div>
+                        <div class="perf-stat-content">
+                            <div class="perf-stat-number" id="totalEscalations">0</div>
+                            <div class="perf-stat-label">Total Escalations</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Charts -->
+                <div class="performance-charts">
+                    <div class="perf-chart-container">
+                        <h3>Daily Performance Overview</h3>
+                        <div id="dailyPerformanceChartLoading" class="chart-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading performance data...</span>
+                        </div>
+                        <canvas id="dailyPerformanceChart" style="display: none; width: 100% !important; height: 100% !important;"></canvas>
+                    </div>
                 </div>
             </div>
             
@@ -400,12 +1221,93 @@
                     <p>This tab will provide quick access to common tasks and shortcuts.</p>
                 </div>
             </div>
+            
+            <!-- Customer Feedback Tab -->
+            <div id="feedback" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Customer Feedback</h1>
+                    <p class="page-subtitle">View and analyze customer satisfaction</p>
+                </div>
+                
+                <!-- Feedback Overview -->
+                <div class="feedback-overview">
+                    <div class="feedback-stats-grid">
+                        <div class="feedback-stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalFeedbackCount">0</div>
+                                <div class="stat-label">Total Feedback</div>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-thumbs-up"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="avgRatingScore">Loading...</div>
+                                <div class="stat-label">Average Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="positiveFeedbackCount">0</div>
+                                <div class="stat-label">Positive (4-5★)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="satisfactionTrend">0%</div>
+                                <div class="stat-label">Satisfaction Trend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feedback List -->
+                <div class="feedback-list-container">
+                    <div class="feedback-list-header">
+                        <h3>Recent Customer Feedback</h3>
+                        <div class="feedback-filters">
+                            <select id="feedbackFilter" onchange="filterFeedback()">
+                                <option value="all">All Feedback</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-list" id="agentFeedbackList">
+                        <div class="loading-placeholder">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading customer feedback...</span>
+                            </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     
     <script>
         // Global variables
         let currentTab = 'overview';
+        let currentAgentId = '{{ current_user.id }}';
+        let escalationChart = null;
+        let resolutionChart = null;
+        let dailyPerformanceChart = null;
         
         // Tab management
         function showTab(tabName) {
@@ -435,16 +1337,16 @@
         function loadTabData(tabName) {
             switch(tabName) {
                 case 'overview':
-                    // Will implement next
+                    loadOverviewData();
                     break;
                 case 'active-issues':
-                    // Will implement next
+                    loadActiveIssues();
                     break;
                 case 'chat-interface':
                     // Will implement next
                     break;
                 case 'performance':
-                    // Will implement next
+                    loadPerformanceData();
                     break;
                 case 'knowledge-base':
                     // Will implement next
@@ -452,7 +1354,320 @@
                 case 'quick-actions':
                     // Will implement next
                     break;
+                case 'feedback':
+                    loadFeedbackData();
+                    break;
             }
+        }
+        
+        // Load overview data
+        async function loadOverviewData() {
+            try {
+                const response = await fetch(`/api/agent/overview/${currentAgentId}`, {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update statistics
+                document.getElementById('activeEscalations').textContent = data.active_escalations;
+                document.getElementById('weeklyEscalations').textContent = data.weekly_escalations;
+                document.getElementById('monthlyEscalations').textContent = data.monthly_escalations;
+                document.getElementById('avgSatisfaction').textContent = data.avg_satisfaction.toFixed(1);
+                
+                // Update recent escalations
+                updateRecentEscalations(data.recent_escalations);
+                
+                // Load detailed stats for charts
+                loadAgentStats();
+                
+            } catch (error) {
+                console.error('Error loading overview data:', error);
+                showError('Failed to load overview data. Please try again.');
+            }
+        }
+        
+        // Load agent statistics
+        async function loadAgentStats() {
+            try {
+                const response = await fetch(`/api/agent/stats/${currentAgentId}`, {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Initialize charts
+                initializeCharts(data);
+                
+            } catch (error) {
+                console.error('Error loading agent stats:', error);
+                showError('Failed to load agent statistics. Please try again.');
+            }
+        }
+        
+        // Initialize charts
+        function initializeCharts(data) {
+            // Escalation Activity Chart
+            if (escalationChart) {
+                escalationChart.destroy();
+            }
+            
+            const escalationCtx = document.getElementById('escalationChart').getContext('2d');
+            escalationChart = new Chart(escalationCtx, {
+                type: 'line',
+                data: {
+                    labels: data.escalation_labels,
+                    datasets: [{
+                        label: 'Escalations',
+                        data: data.escalation_activity,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Hide loading and show chart
+            document.getElementById('escalationChartLoading').style.display = 'none';
+            document.getElementById('escalationChart').style.display = 'block';
+            
+            // Resolution Rate Chart
+            if (resolutionChart) {
+                resolutionChart.destroy();
+            }
+            
+            const resolutionCtx = document.getElementById('resolutionChart').getContext('2d');
+            resolutionChart = new Chart(resolutionCtx, {
+                type: 'line',
+                data: {
+                    labels: data.escalation_labels,
+                    datasets: [{
+                        label: 'Resolution Rate %',
+                        data: data.resolution_trend,
+                        borderColor: '#17a2b8',
+                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Hide loading and show chart
+            document.getElementById('resolutionChartLoading').style.display = 'none';
+            document.getElementById('resolutionChart').style.display = 'block';
+        }
+        
+        // Update recent escalations
+        function updateRecentEscalations(escalations) {
+            const container = document.getElementById('recentEscalationsList');
+            
+            if (!escalations || escalations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Recent Escalations</h3>
+                        <p>You haven't handled any escalations recently.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = escalations.map(esc => `
+                <div class="escalation-item">
+                    <div class="escalation-header">
+                        <span class="escalation-session">${esc.session_id}</span>
+                        <span class="escalation-status status-${esc.status}">${esc.status.replace('_', ' ')}</span>
+                    </div>
+                    <div class="escalation-reason">${esc.reason}</div>
+                    <div class="escalation-time">
+                        ${new Date(esc.timestamp).toLocaleString()}
+                        ${esc.satisfaction_score ? ` • Satisfaction: ${esc.satisfaction_score}/5` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load active issues
+        async function loadActiveIssues() {
+            try {
+                const response = await fetch('/api/agent/escalations', {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                updateActiveIssuesTable(data.escalations);
+                
+            } catch (error) {
+                console.error('Error loading active issues:', error);
+                showError('Failed to load active issues. Please try again.');
+            }
+        }
+        
+        // Update active issues table
+        function updateActiveIssuesTable(escalations) {
+            const tbody = document.getElementById('activeIssuesTable');
+            
+            if (!escalations || escalations.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>No Active Issues</h3>
+                            <p>All escalations have been resolved!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = escalations.map(esc => `
+                <tr>
+                    <td>${esc.session_id}</td>
+                    <td>${esc.reason}</td>
+                    <td>${(esc.ai_confidence * 100).toFixed(1)}%</td>
+                    <td>${new Date(esc.timestamp).toLocaleString()}</td>
+                    <td>
+                        <span class="escalation-status status-${esc.status}">
+                            ${esc.status.replace('_', ' ')}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewChat('${esc.session_id}')">
+                            View Chat
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Load performance data
+        async function loadPerformanceData() {
+            try {
+                const response = await fetch(`/api/agent/stats/${currentAgentId}`, {
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update performance statistics
+                document.getElementById('totalMessages').textContent = data.total_messages;
+                document.getElementById('avgResponseTime').textContent = data.avg_response_time;
+                document.getElementById('resolutionRate').textContent = data.resolution_rate + '%';
+                document.getElementById('totalEscalations').textContent = data.total_escalations;
+                
+                // Initialize performance chart
+                initializePerformanceChart(data);
+                
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+                showError('Failed to load performance data. Please try again.');
+            }
+        }
+        
+        // Initialize performance chart
+        function initializePerformanceChart(data) {
+            if (dailyPerformanceChart) {
+                dailyPerformanceChart.destroy();
+            }
+            
+            const ctx = document.getElementById('dailyPerformanceChart').getContext('2d');
+            dailyPerformanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.escalation_labels,
+                    datasets: [{
+                        label: 'Escalations Handled',
+                        data: data.escalation_activity,
+                        backgroundColor: 'rgba(23, 162, 184, 0.8)',
+                        borderColor: '#17a2b8',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Hide loading and show chart
+            document.getElementById('dailyPerformanceChartLoading').style.display = 'none';
+            document.getElementById('dailyPerformanceChart').style.display = 'block';
+        }
+        
+        // View chat for a specific session
+        function viewChat(sessionId) {
+            // This will be implemented when chat interface is added
+            console.log('Viewing chat for session:', sessionId);
+        }
+        
+        // Show error message
+        function showError(message) {
+            // Simple error display - can be enhanced with a proper notification system
+            alert('Error: ' + message);
         }
         
         // Toggle sidebar on mobile
@@ -461,10 +1676,373 @@
             sidebar.classList.toggle('show');
         }
         
+        // Feedback Management Functions
+        async function loadFeedbackData() {
+            try {
+                const response = await fetch(`/api/agent/feedback/${currentAgentId}`, {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    updateFeedbackDisplay(data.feedback);
+                } else {
+                    throw new Error('Failed to load feedback');
+                }
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                document.getElementById('agentFeedbackList').innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Failed to load feedback</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function updateFeedbackDisplay(feedbackList) {
+            if (!feedbackList || feedbackList.length === 0) {
+                document.getElementById('agentFeedbackList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <h3>No Customer Feedback</h3>
+                        <p>You haven't received any feedback yet.</p>
+                    </div>
+                `;
+                
+                // Reset stats
+                document.getElementById('totalFeedbackCount').textContent = '0';
+                document.getElementById('avgRatingScore').textContent = '0.0';
+                document.getElementById('positiveFeedbackCount').textContent = '0';
+                document.getElementById('satisfactionTrend').textContent = '0%';
+                return;
+            }
+            
+            // Calculate statistics
+            const totalFeedback = feedbackList.length;
+            const totalRating = feedbackList.reduce((sum, fb) => sum + fb.rating, 0);
+            const avgRating = totalRating / totalFeedback;
+            const positiveFeedback = feedbackList.filter(fb => fb.rating >= 4).length;
+            const satisfactionTrend = ((positiveFeedback / totalFeedback) * 100).toFixed(1);
+            
+            // Update stats
+            document.getElementById('totalFeedbackCount').textContent = totalFeedback;
+            document.getElementById('avgRatingScore').textContent = avgRating.toFixed(1);
+            document.getElementById('positiveFeedbackCount').textContent = positiveFeedback;
+            document.getElementById('satisfactionTrend').textContent = satisfactionTrend + '%';
+            
+            // Display feedback list
+            const container = document.getElementById('agentFeedbackList');
+            container.innerHTML = feedbackList.map(fb => `
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <div class="feedback-rating">
+                            ${generateStarRating(fb.rating)}
+                        </div>
+                        <div class="feedback-time">
+                            ${new Date(fb.created_at).toLocaleString()}
+                        </div>
+                        <span class="feedback-type">${fb.feedback_type}</span>
+                    </div>
+                    ${fb.comment ? `<div class="feedback-comment">${fb.comment}</div>` : ''}
+                    <div class="feedback-session">Session: ${fb.session_id}</div>
+                </div>
+            `).join('');
+        }
+        
+        function generateStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<span class="feedback-star">★</span>';
+                } else {
+                    stars += '<span class="feedback-star empty">☆</span>';
+                }
+            }
+            return stars;
+        }
+        
+        function filterFeedback() {
+            const filterValue = document.getElementById('feedbackFilter').value;
+            // This function can be implemented to filter feedback by rating
+            // For now, just reload the feedback data
+            loadFeedbackData();
+        }
+        
+        // Status Toggle Functionality
+        let isOnline = false;
+        let sessionStartTime = null;
+        let totalWorkTime = 0;
+        let todayWorkTime = 0;
+        let lastResetDate = null;
+        
+        function initializeStatusToggle() {
+            console.log('initializeStatusToggle called');
+            const statusToggle = document.getElementById('statusToggle');
+            const statusText = document.getElementById('statusText');
+            const statusTime = document.getElementById('statusTime');
+            
+            console.log('Status toggle elements found:', {
+                statusToggle: !!statusToggle,
+                statusText: !!statusText,
+                statusTime: !!statusTime
+            });
+            
+            // Check for daily reset
+            checkDailyReset();
+            
+            // Load saved status from localStorage
+            const savedStatus = localStorage.getItem('agentStatus');
+            if (savedStatus) {
+                const status = JSON.parse(savedStatus);
+                isOnline = status.isOnline;
+                sessionStartTime = status.sessionStartTime ? new Date(status.sessionStartTime) : null;
+                totalWorkTime = status.totalWorkTime || 0;
+                todayWorkTime = status.todayWorkTime || 0;
+                lastResetDate = status.lastResetDate ? new Date(status.lastResetDate) : null;
+                
+                // Resume session if it was interrupted
+                if (isOnline && sessionStartTime) {
+                    const now = new Date();
+                    const elapsed = (now - sessionStartTime) / 1000 / 60; // in minutes
+                    todayWorkTime += elapsed;
+                    sessionStartTime = now; // Reset to current time
+                    startSessionTimer();
+                }
+                
+                updateStatusDisplay();
+            }
+            
+            console.log('Adding click event listener to status toggle');
+            statusToggle.addEventListener('click', toggleStatus);
+            console.log('Click event listener added');
+            
+            // Handle page visibility change (when user switches tabs or closes browser)
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Handle beforeunload (when user closes browser)
+            window.addEventListener('beforeunload', handleBeforeUnload);
+        }
+        
+        function checkDailyReset() {
+            const today = new Date().toDateString();
+            const savedStatus = localStorage.getItem('agentStatus');
+            
+            if (savedStatus) {
+                const status = JSON.parse(savedStatus);
+                if (status.lastResetDate !== today) {
+                    // New day, reset today's work time
+                    todayWorkTime = 0;
+                    lastResetDate = today;
+                    saveStatus();
+                } else {
+                    lastResetDate = status.lastResetDate;
+                    todayWorkTime = status.todayWorkTime || 0;
+                }
+            } else {
+                lastResetDate = today;
+                todayWorkTime = 0;
+            }
+        }
+        
+        function toggleStatus() {
+            console.log('Status toggle clicked, current state:', isOnline);
+            if (isOnline) {
+                // Going offline
+                console.log('Going offline...');
+                goOffline();
+            } else {
+                // Going online
+                console.log('Going online...');
+                goOnline();
+            }
+        }
+        
+        function goOnline() {
+            console.log('goOnline called');
+            // Update local state immediately for better UX
+            isOnline = true;
+            sessionStartTime = new Date();
+            console.log('Local state updated, calling updateStatusDisplay');
+            updateStatusDisplay();
+            startSessionTimer();
+            
+            // Send status update to server
+            console.log('Sending status update to server...');
+            updateServerStatus('online');
+        }
+        
+        function goOffline() {
+            // Update local state immediately for better UX
+            if (sessionStartTime) {
+                const sessionDuration = (new Date() - sessionStartTime) / 1000 / 60;
+                totalWorkTime += sessionDuration;
+                todayWorkTime += sessionDuration;
+            }
+            
+            isOnline = false;
+            sessionStartTime = null;
+            updateStatusDisplay();
+            stopSessionTimer();
+            
+            // Send status update to server
+            updateServerStatus('offline');
+        }
+        
+        function updateStatusDisplay() {
+            const statusToggle = document.getElementById('statusToggle');
+            const statusText = document.getElementById('statusText');
+            const statusTime = document.getElementById('statusTime');
+            
+            if (isOnline) {
+                statusToggle.className = 'status-btn online';
+                statusText.textContent = 'Online';
+                statusTime.textContent = `Today: ${formatTime(todayWorkTime)} | Total: ${formatTime(totalWorkTime)}`;
+            } else {
+                statusToggle.className = 'status-btn offline';
+                statusText.textContent = 'Offline';
+                statusTime.textContent = `Today: ${formatTime(todayWorkTime)} | Total: ${formatTime(totalWorkTime)}`;
+            }
+        }
+        
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.floor(minutes % 60);
+            const secs = Math.floor((minutes * 60) % 60);
+            
+            if (hours > 0) {
+                return `${hours}h ${mins}m ${secs}s`;
+            } else if (mins > 0) {
+                return `${mins}m ${secs}s`;
+            } else {
+                return `${secs}s`;
+            }
+        }
+        
+        function saveStatus() {
+            localStorage.setItem('agentStatus', JSON.stringify({
+                isOnline,
+                sessionStartTime: sessionStartTime ? sessionStartTime.toISOString() : null,
+                totalWorkTime,
+                todayWorkTime,
+                lastResetDate: lastResetDate ? lastResetDate.toDateString() : null
+            }));
+        }
+        
+        function updateServerStatus(status) {
+            console.log('updateServerStatus called with status:', status);
+            // Send status update to server
+            fetch('/api/agent/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    status: status,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log(`Status updated to: ${status}`);
+                    // Save the current status to localStorage
+                    saveStatus();
+                } else {
+                    console.error('Server returned error:', data.error);
+                    // Show error notification but don't revert local state
+                    showNotification('Failed to update status on server', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to update server status:', error);
+                // Show error notification but don't revert local state
+                showNotification('Failed to connect to server', 'error');
+            });
+        }
+        
+        let sessionTimer = null;
+        
+        function startSessionTimer() {
+            sessionTimer = setInterval(() => {
+                if (isOnline && sessionStartTime) {
+                    const elapsed = (new Date() - sessionStartTime) / 1000 / 60; // in minutes
+                    const currentTodayTime = todayWorkTime + elapsed;
+                    document.getElementById('statusTime').textContent = `Working: ${formatTime(currentTodayTime)} | Total: ${formatTime(totalWorkTime + elapsed)}`;
+                }
+            }, 1000); // Update every second for real-time display
+        }
+        
+        function stopSessionTimer() {
+            if (sessionTimer) {
+                clearInterval(sessionTimer);
+                sessionTimer = null;
+            }
+        }
+        
+        function handleVisibilityChange() {
+            if (document.hidden && isOnline) {
+                // User switched tabs or minimized browser
+                goOffline();
+            }
+        }
+        
+        function handleBeforeUnload() {
+            if (isOnline) {
+                goOffline();
+            }
+        }
+        
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            // Add to page
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+        
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Load initial tab data
-            loadTabData(currentTab);
+            try {
+                console.log('DOMContentLoaded event fired');
+                // Load initial tab data
+                loadTabData(currentTab);
+                console.log('Calling initializeStatusToggle...');
+                initializeStatusToggle();
+                console.log('initializeStatusToggle called');
+            } catch (error) {
+                console.error('Error during dashboard initialization:', error);
+            }
+        });
+        
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+        });
+        
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
         });
     </script>
 </body>

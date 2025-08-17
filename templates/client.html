@@ -183,6 +183,20 @@
             50% { opacity: 1; }
         }
         
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         .chat-input {
             display: flex;
             padding: 20px;
@@ -243,6 +257,138 @@
             margin: 20px;
             text-align: center;
             border: 1px solid #ffeaa7;
+        }
+        
+        /* Feedback Interface Styles */
+        .feedback-interface {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feedback-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .feedback-header h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .feedback-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .feedback-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .rating-section, .feedback-type-section, .comment-section {
+            margin-bottom: 20px;
+        }
+        
+        .rating-section label, .feedback-type-section label, .comment-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 5px;
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label.star {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .star-rating label.star:hover,
+        .star-rating label.star:hover ~ label.star,
+        .star-rating input:checked ~ label.star {
+            color: #ffc107;
+        }
+        
+        .feedback-type-section select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .feedback-type-section select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .comment-section textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        
+        .comment-section textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .feedback-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-1px);
         }
         
         /* Responsive Design */
@@ -397,6 +543,57 @@
                     <strong>🔄 Escalating to Human Agent</strong><br>
                     Please wait while we connect you with a specialist.
                 </div>
+                
+                <!-- Feedback Submission Interface -->
+                <div class="feedback-interface" id="feedbackInterface" style="display: none;">
+                    <div class="feedback-header">
+                        <h3>📝 Session Feedback</h3>
+                        <p>How was your experience with our support team?</p>
+                    </div>
+                    
+                    <div class="feedback-form">
+                        <div class="rating-section">
+                            <label>Overall Satisfaction:</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="rating" value="5">
+                                <label for="star5" class="star">★</label>
+                                <input type="radio" id="star4" name="rating" value="4">
+                                <label for="star4" class="star">★</label>
+                                <input type="radio" id="star3" name="rating" value="3">
+                                <label for="star3" class="star">★</label>
+                                <input type="radio" id="star2" name="rating" value="2">
+                                <label for="star2" class="star">★</label>
+                                <input type="radio" id="star1" name="rating" value="1">
+                                <label for="star1" class="star">★</label>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-type-section">
+                            <label for="feedbackType">Feedback Type:</label>
+                            <select id="feedbackType">
+                                <option value="general">General</option>
+                                <option value="technical">Technical</option>
+                                <option value="service">Service</option>
+                                <option value="billing">Billing</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="comment-section">
+                            <label for="feedbackComment">Additional Comments:</label>
+                            <textarea id="feedbackComment" placeholder="Tell us about your experience..." rows="3"></textarea>
+                        </div>
+                        
+                        <div class="feedback-actions">
+                            <button class="btn btn-primary" onclick="submitFeedback()">
+                                <i class="fas fa-paper-plane"></i> Submit Feedback
+                            </button>
+                            <button class="btn btn-secondary" onclick="hideFeedbackInterface()">
+                                <i class="fas fa-times"></i> Skip
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Main Chat Area -->
@@ -437,19 +634,115 @@
         async function initializeSession() {
             try {
                 console.log('Initializing session...');
+                
+                // Show loading state with enhanced styling
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.style.background = '#ffc107'; // Yellow for loading
+                
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.textContent = 'Initializing...';
+                connectionStatus.style.color = '#17a2b8';
+                
+                // Update loading message to show progress with enhanced animations and improved UX
+                const messagesContainer = document.getElementById('messages');
+                const loadingMessage = messagesContainer.querySelector('.message.bot');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                            <div class="spinner" style="width: 32px; height: 32px;"></div>
+                            <div style="text-align: center;">
+                                <span style="font-weight: 600; font-size: 1.2rem;">Initializing chat system...</span><br>
+                                <small style="opacity: 0.7; color: #666;">Please wait while we set up your session</small><br>
+                                <small style="opacity: 0.5; color: #666;">This may take a few seconds</small><br>
+                                <div style="margin-top: 10px; padding: 5px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; display: inline-block;">
+                                    <small style="opacity: 0.6;">Creating session...</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add enhanced progress animation with bounce and glow effect
+                    loadingMessage.style.transform = 'scale(1.02)';
+                    loadingMessage.style.boxShadow = '0 0 20px rgba(255, 193, 7, 0.2)';
+                    loadingMessage.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    
+                    setTimeout(() => {
+                        loadingMessage.style.transform = 'scale(1)';
+                        loadingMessage.style.boxShadow = 'none';
+                    }, 400);
+                }
+                
                 const response = await fetch('/api/session', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'}
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 sessionId = data.session_id;
                 console.log('Session created:', sessionId);
                 
+                // Update loading message to show progress with enhanced animations and improved UX
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                            <div class="spinner" style="width: 32px; height: 32px;"></div>
+                            <div style="text-align: center;">
+                                <span style="font-weight: 600; font-size: 1.2rem;">Initializing chat system...</span><br>
+                                <small style="opacity: 0.7; color: #666;">Please wait while we set up your session</small><br>
+                                <small style="opacity: 0.5; color: #666;">This may take a few seconds</small><br>
+                                <div style="margin-top: 10px; padding: 5px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; display: inline-block;">
+                                    <small style="opacity: 0.6;">Connecting to AI service...</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add enhanced progress animation with bounce and glow effect
+                    loadingMessage.style.transform = 'scale(1.02)';
+                    loadingMessage.style.boxShadow = '0 0 20px rgba(23, 162, 184, 0.2)';
+                    
+                    setTimeout(() => {
+                        loadingMessage.style.transform = 'scale(1)';
+                        loadingMessage.style.boxShadow = 'none';
+                    }, 400);
+                }
+                
+                // Update status to connected with enhanced styling
+                statusIndicator.style.background = '#28a745'; // Green for connected
+                connectionStatus.textContent = 'Session Ready';
+                connectionStatus.style.color = '#28a745';
+                
                 // Try to initialize WebSocket
                 initializeWebSocket();
+                
             } catch (error) {
                 console.error('Failed to create session:', error);
+                
+                // Update status to error with enhanced styling
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.style.background = '#dc3545'; // Red for error
+                
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.textContent = 'Connection Failed';
+                connectionStatus.style.color = '#dc3545';
+                
                 showError('Failed to create chat session. Please refresh the page.');
+                
+                // Try to reconnect after 5 seconds
+                setTimeout(() => {
+                    console.log('Attempting to reconnect...');
+                    initializeSession();
+                }, 5000);
             }
         }
         
@@ -457,6 +750,44 @@
         function initializeWebSocket() {
             try {
                 console.log('Initializing WebSocket...');
+                
+                // Show loading state with enhanced styling
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.style.background = '#ffc107'; // Yellow for loading
+                
+                const connectionStatus = document.getElementById('connectionStatus');
+                connectionStatus.textContent = 'Connecting WebSocket...';
+                connectionStatus.style.color = '#ffc107';
+                
+                // Update loading message to show progress with enhanced animations and improved UX
+                const messagesContainer = document.getElementById('messages');
+                const loadingMessage = messagesContainer.querySelector('.message.bot');
+                if (loadingMessage) {
+                    loadingMessage.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                            <div class="spinner" style="width: 32px; height: 32px;"></div>
+                            <div style="text-align: center;">
+                                <span style="font-weight: 600; font-size: 1.2rem;">Initializing chat system...</span><br>
+                                <small style="opacity: 0.7; color: #666;">Please wait while we set up your session</small><br>
+                                <small style="opacity: 0.5; color: #666;">This may take a few seconds</small><br>
+                                <div style="margin-top: 10px; padding: 5px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; display: inline-block;">
+                                    <small style="opacity: 0.6;">Establishing real-time connection...</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add enhanced progress animation with bounce and glow effect
+                    loadingMessage.style.transform = 'scale(1.02)';
+                    loadingMessage.style.boxShadow = '0 0 20px rgba(255, 193, 7, 0.2)';
+                    loadingMessage.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    
+                    setTimeout(() => {
+                        loadingMessage.style.transform = 'scale(1)';
+                        loadingMessage.style.boxShadow = 'none';
+                    }, 400);
+                }
+                
                 socket = io({
                     transports: ['websocket', 'polling'],
                     timeout: 5000,
@@ -468,7 +799,7 @@
                     useWebSocket = true;
                     isConnected = true;
                     updateStatusIndicator(true);
-                    updateConnectionStatus('WebSocket');
+                    updateConnectionStatus('WebSocket Connected');
                 });
                 
                 socket.on('disconnect', function() {
@@ -476,7 +807,7 @@
                     useWebSocket = false;
                     isConnected = false;
                     updateStatusIndicator(false);
-                    updateConnectionStatus('HTTP API');
+                    updateConnectionStatus('HTTP API (Fallback)');
                 });
                 
                 socket.on('typing', function(data) {
@@ -512,26 +843,199 @@
         
         function updateStatusIndicator(connected) {
             const indicator = document.getElementById('statusIndicator');
-            indicator.style.background = connected ? '#28a745' : '#dc3545';
+            if (connected) {
+                indicator.style.background = '#28a745'; // Green for connected
+                indicator.style.animation = 'pulse 2s infinite';
+                indicator.title = 'Connected - Real-time communication active';
+                
+                // Add enhanced success animation with bounce and glow effect
+                indicator.style.transform = 'scale(1.3)';
+                indicator.style.boxShadow = '0 0 20px rgba(40, 167, 69, 0.5)';
+                indicator.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1)';
+                    indicator.style.boxShadow = 'none';
+                }, 400);
+            } else {
+                indicator.style.background = '#dc3545'; // Red for disconnected
+                indicator.style.animation = 'none';
+                indicator.title = 'Disconnected - Using fallback mode';
+                
+                // Add enhanced error animation with shake and glow effect
+                indicator.style.transform = 'scale(0.9)';
+                indicator.style.boxShadow = '0 0 20px rgba(220, 53, 69, 0.5)';
+                indicator.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1)';
+                    indicator.style.boxShadow = 'none';
+                }, 400);
+            }
         }
         
         function updateConnectionStatus(status) {
             const statusDiv = document.getElementById('connectionStatus');
+            const previousStatus = statusDiv.textContent;
             statusDiv.textContent = status;
+            
+            // Add status-specific styling, tooltips, and enhanced animations with improved UX
+            if (status.includes('WebSocket Connected')) {
+                statusDiv.style.color = '#28a745';
+                statusDiv.title = 'Real-time WebSocket connection active - Best performance';
+                
+                // Add enhanced success animation with bounce, glow, and text-shadow effect
+                statusDiv.style.transform = 'scale(1.15)';
+                statusDiv.style.textShadow = '0 0 15px rgba(40, 167, 69, 0.6)';
+                statusDiv.style.boxShadow = '0 0 20px rgba(40, 167, 69, 0.3)';
+                statusDiv.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    statusDiv.style.transform = 'scale(1)';
+                    statusDiv.style.textShadow = 'none';
+                    statusDiv.style.boxShadow = 'none';
+                }, 500);
+            } else if (status.includes('HTTP API')) {
+                statusDiv.style.color = '#ffc107';
+                statusDiv.title = 'Using HTTP API fallback - Reliable but slower';
+            } else if (status.includes('Initializing')) {
+                statusDiv.style.color = '#17a2b8';
+                statusDiv.title = 'Setting up connection... Please wait';
+            } else if (status.includes('Connecting WebSocket')) {
+                statusDiv.style.color = '#ffc107';
+                statusDiv.title = 'Attempting WebSocket connection...';
+            } else if (status.includes('Session Ready')) {
+                statusDiv.style.color = '#28a745';
+                statusDiv.title = 'Chat session ready - You can start messaging';
+                
+                // Add enhanced success animation with bounce, glow, and text-shadow effect
+                statusDiv.style.transform = 'scale(1.15)';
+                statusDiv.style.textShadow = '0 0 15px rgba(40, 167, 69, 0.6)';
+                statusDiv.style.boxShadow = '0 0 20px rgba(40, 167, 69, 0.3)';
+                statusDiv.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    statusDiv.style.transform = 'scale(1)';
+                    statusDiv.style.textShadow = 'none';
+                    statusDiv.style.boxShadow = 'none';
+                }, 500);
+            } else if (status.includes('Failed')) {
+                statusDiv.style.color = '#dc3545';
+                statusDiv.title = 'Connection failed - Retrying automatically...';
+                
+                // Add enhanced error animation with shake, glow, and text-shadow effect
+                statusDiv.style.transform = 'scale(0.9)';
+                statusDiv.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.6)';
+                statusDiv.style.boxShadow = '0 0 20px rgba(220, 53, 69, 0.3)';
+                statusDiv.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                setTimeout(() => {
+                    statusDiv.style.transform = 'scale(1)';
+                    statusDiv.style.textShadow = 'none';
+                    statusDiv.style.boxShadow = 'none';
+                }, 500);
+            } else {
+                statusDiv.style.color = '#6c757d';
+                statusDiv.title = 'Unknown connection status';
+            }
+            
+            // Add smooth transition animation with enhanced easing
+            statusDiv.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
         }
         
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
+            
+            // Show error with animation, icon, close button, better styling, enhanced entrance animation, and improved UX
+            errorDiv.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #721c24; font-size: 1.4rem;"></i>
+                    <div style="flex: 1; text-align: center;">
+                        <span style="font-weight: 600; font-size: 1.1rem;">${message}</span><br>
+                        <small style="opacity: 0.7; color: #721c24;">If this problem persists, please refresh the page</small>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.style.display='none'" 
+                            style="background: none; border: none; color: #721c24; cursor: pointer; padding: 8px; border-radius: 4px; transition: all 0.2s;"
+                            onmouseover="this.style.backgroundColor='rgba(114, 28, 36, 0.1)'; this.style.transform='scale(1.1)'"
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.transform='scale(1)'">
+                        <i class="fas fa-times" style="font-size: 1.2rem;"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Add enhanced entrance animation with slide and bounce effect
             errorDiv.style.display = 'block';
+            errorDiv.style.opacity = '0';
+            errorDiv.style.transform = 'translateX(100%) scale(0.9)';
+            errorDiv.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            // Trigger entrance animation
             setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+                errorDiv.style.opacity = '1';
+                errorDiv.style.transform = 'translateX(0) scale(1)';
+            }, 50);
+            
+            // Auto-hide after 12 seconds with enhanced exit animation
+            setTimeout(() => {
+                errorDiv.style.opacity = '0';
+                errorDiv.style.transform = 'translateX(100%) scale(0.9)';
+                
+                // Hide after animation
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 500);
+            }, 12000);
         }
         
         function showEscalationNotice() {
             const notice = document.getElementById('escalationNotice');
+            
+            // Show escalation notice with animation, spinner, close button, better styling, enhanced entrance animation, and improved UX
+            notice.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                    <div class="spinner" style="width: 26px; height: 26px;"></div>
+                    <div style="text-align: center; flex: 1;">
+                        <strong style="font-size: 1.3rem; color: #856404;">🔄 Escalating to Human Agent</strong><br>
+                        <span style="font-size: 1.1rem; opacity: 0.8; color: #856404;">Please wait while we connect you with a specialist.</span><br>
+                        <small style="opacity: 0.6; color: #856404;">This process may take a few moments</small>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.style.display='none'" 
+                            style="background: none; border: none; color: #856404; cursor: pointer; padding: 8px; border-radius: 4px; transition: all 0.2s;"
+                            onmouseover="this.style.backgroundColor='rgba(133, 100, 4, 0.1)'; this.style.transform='scale(1.1)'"
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.transform='scale(1)'">
+                        <i class="fas fa-times" style="font-size: 1.2rem;"></i>
+                    </button>
+                </div>
+            `;
+            
+            // Add enhanced entrance animation with slide and bounce effect
             notice.style.display = 'block';
+            notice.style.opacity = '0';
+            notice.style.transform = 'translateY(20px) scale(0.95)';
+            notice.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            // Trigger entrance animation
+            setTimeout(() => {
+                notice.style.opacity = '1';
+                notice.style.transform = 'translateY(0) scale(1)';
+            }, 50);
+            
+            // Remove spinner after 3 seconds and show final message with smooth transition
+            setTimeout(() => {
+                notice.innerHTML = `
+                    <div style="text-align: center; flex: 1;">
+                        <strong style="font-size: 1.3rem; color: #856404;">🔄 Escalating to Human Agent</strong><br>
+                        <span style="font-size: 1.1rem; opacity: 0.8; color: #856404;">Please wait while we connect you with a specialist.</span><br>
+                        <small style="opacity: 0.6; color: #856404;">This process may take a few moments</small>
+                    </div>
+                `;
+                
+                // Add content update animation
+                notice.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    notice.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
         }
         
         function addMessage(content, sender, isEscalated = false) {
@@ -540,23 +1044,122 @@
             
             if (isEscalated) {
                 messageDiv.className = 'message escalation';
+                messageDiv.innerHTML = content;
+                
+                // Add entrance animation for escalation messages
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px) scale(0.95)';
+                messageDiv.style.transition = 'all 0.4s ease';
+                
+                messagesContainer.appendChild(messageDiv);
+                
+                // Trigger entrance animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0) scale(1)';
+                }, 50);
+            } else if (sender === 'bot') {
+                messageDiv.className = 'message bot';
+                
+                // Add typing animation for bot messages with better styling, animations, and enhanced effects
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="spinner" style="width: 18px; height: 18px;"></div>
+                        <div style="flex: 1;">
+                            <span>${content}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Add entrance animation with enhanced effects
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px) scale(0.95)';
+                messageDiv.style.transition = 'all 0.4s ease';
+                
+                messagesContainer.appendChild(messageDiv);
+                
+                // Trigger entrance animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0) scale(1)';
+                }, 50);
+                
+                // Remove spinner after a short delay with fade effect
+                setTimeout(() => {
+                    messageDiv.innerHTML = content;
+                    
+                    // Add content reveal animation
+                    messageDiv.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        messageDiv.style.transform = 'scale(1)';
+                    }, 200);
+                }, 500);
             } else {
                 messageDiv.className = `message ${sender}`;
+                messageDiv.textContent = content;
+                
+                // Add entrance animation for user messages with enhanced effects
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px) scale(0.95)';
+                messageDiv.style.transition = 'all 0.4s ease';
+                
+                messagesContainer.appendChild(messageDiv);
+                
+                // Trigger entrance animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0) scale(1)';
+                }, 50);
             }
             
-            messageDiv.textContent = content;
-            messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
         function showTyping() {
             const typingIndicator = document.getElementById('typing');
             typingIndicator.style.display = 'block';
+            
+            // Add typing animation with spinner, better styling, enhanced entrance animation, and improved UX
+            typingIndicator.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                    <div class="spinner" style="width: 22px; height: 22px;"></div>
+                    <div style="text-align: center;">
+                        <span style="font-style: italic; color: #666; font-size: 1.1rem;">AI Assistant is typing...</span><br>
+                        <small style="opacity: 0.7; color: #666;">Please wait for the response</small><br>
+                        <small style="opacity: 0.5; color: #666;">This usually takes just a few seconds</small>
+                    </div>
+                </div>
+            `;
+            
+            // Add enhanced entrance animation with slide and bounce effect
+            typingIndicator.style.opacity = '0';
+            typingIndicator.style.transform = 'translateY(10px) scale(0.95)';
+            typingIndicator.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            // Trigger entrance animation
+            setTimeout(() => {
+                typingIndicator.style.opacity = '1';
+                typingIndicator.style.transform = 'translateY(0) scale(1)';
+            }, 50);
         }
         
         function hideTyping() {
             const typingIndicator = document.getElementById('typing');
-            typingIndicator.style.display = 'none';
+            
+            // Add enhanced exit animation with slide and fade effect
+            typingIndicator.style.opacity = '0';
+            typingIndicator.style.transform = 'translateY(10px) scale(0.95)';
+            typingIndicator.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            // Hide after animation
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                typingIndicator.style.opacity = '1';
+                typingIndicator.style.transform = 'translateY(0) scale(1)';
+            }, 400);
+            
+            // Reset to original text
+            typingIndicator.innerHTML = 'AI Assistant is typing...';
         }
         
         // Send message using HTTP API
@@ -581,11 +1184,16 @@
                 console.log('Response ok:', response.ok);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
                 console.log('Response data:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 addMessage(data.content, data.sender, data.is_escalated);
                 hideTyping();
                 
@@ -597,13 +1205,28 @@
             } catch (error) {
                 console.error('HTTP API error:', error);
                 hideTyping();
-                showError('Failed to send message. Please try again.');
+                
+                // Show specific error message
+                let errorMessage = 'Failed to send message. Please try again.';
+                if (error.message.includes('HTTP 500')) {
+                    errorMessage = 'Server error. Please try again later.';
+                } else if (error.message.includes('HTTP 400')) {
+                    errorMessage = 'Invalid request. Please check your message.';
+                } else if (error.message.includes('HTTP 503')) {
+                    errorMessage = 'Service temporarily unavailable. Please try again later.';
+                }
+                
+                showError(errorMessage);
+                
+                // Add error message to chat
+                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
             }
         }
         
         // Send message using WebSocket or HTTP API
         async function sendMessage() {
             const input = document.getElementById('messageInput');
+            const sendButton = document.querySelector('.chat-input button');
             const message = input.value.trim();
             
             console.log('sendMessage called with:', message);
@@ -611,9 +1234,36 @@
             console.log('useWebSocket:', useWebSocket);
             console.log('socket connected:', socket && socket.connected);
             
-            if (!message || !sessionId) {
-                console.log('Message or sessionId missing');
+            if (!message) {
+                console.log('Message is empty');
                 return;
+            }
+            
+            // Show loading state on send button
+            const originalText = sendButton.innerHTML;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            sendButton.disabled = true;
+            
+            if (!sessionId) {
+                console.log('No session ID, creating new session...');
+                try {
+                    const response = await fetch('/api/session', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({})
+                    });
+                    const data = await response.json();
+                    sessionId = data.session_id;
+                    console.log('New session created:', sessionId);
+                } catch (error) {
+                    console.error('Failed to create session:', error);
+                    showError('Failed to create chat session. Please refresh the page.');
+                    
+                    // Re-enable send button
+                    sendButton.innerHTML = originalText;
+                    sendButton.disabled = false;
+                    return;
+                }
             }
             
             // Add user message to chat
@@ -632,12 +1282,26 @@
                 console.log('Sending via HTTP API');
                 await sendMessageHttp(message);
             }
+            
+            // Re-enable send button after a short delay
+            setTimeout(() => {
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
+            }, 1000);
         }
         
         function sendQuickMessage(message) {
             if (sessionId) {
+                // Show loading state on the button
+                const button = event.target;
+                const originalText = button.textContent;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                button.disabled = true;
+                
+                // Add user message to chat
                 addMessage(message, 'user');
                 
+                // Send message
                 if (useWebSocket && socket && socket.connected) {
                     socket.emit('message', {
                         session_id: sessionId,
@@ -646,6 +1310,12 @@
                 } else {
                     sendMessageHttp(message);
                 }
+                
+                // Re-enable button after a short delay
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
             }
         }
         
@@ -657,11 +1327,111 @@
         
         function toggleQuickActions() {
             const quickActions = document.querySelector('.quick-actions');
-            quickActions.classList.toggle('show');
+            const button = document.getElementById('toggleQuickActions');
+            
+            if (quickActions.classList.contains('show')) {
+                // Hide quick actions
+                quickActions.classList.remove('show');
+                button.innerHTML = '⚡';
+            } else {
+                // Show quick actions with loading state
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                button.disabled = true;
+                
+                // Simulate load delay
+                setTimeout(() => {
+                    quickActions.classList.add('show');
+                    button.innerHTML = '✕';
+                    button.disabled = false;
+                }, 300);
+            }
         }
         
         // Initialize everything
-        initializeSession();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading state with enhanced transitions
+            const chatContainer = document.querySelector('.chat-container');
+            chatContainer.style.opacity = '0.8';
+            chatContainer.style.transition = 'all 0.5s ease';
+            
+            // Show loading message with better styling, progress indication, enhanced animations, and improved UX
+            const messagesContainer = document.getElementById('messages');
+            const loadingMessage = document.createElement('div');
+            loadingMessage.className = 'message bot';
+            loadingMessage.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                    <div class="spinner" style="width: 32px; height: 32px;"></div>
+                    <div style="text-align: center;">
+                        <span style="font-weight: 600; font-size: 1.2rem;">Initializing chat system...</span><br>
+                        <small style="opacity: 0.7; color: #666;">Please wait while we set up your session</small><br>
+                        <small style="opacity: 0.5; color: #666;">This may take a few seconds</small><br>
+                        <div style="margin-top: 10px; padding: 5px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; display: inline-block;">
+                            <small style="opacity: 0.6;">Setting up AI assistant...</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add enhanced entrance animation for loading message with slide and bounce effect
+            loadingMessage.style.opacity = '0';
+            loadingMessage.style.transform = 'translateY(30px) scale(0.95)';
+            loadingMessage.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            messagesContainer.appendChild(loadingMessage);
+            
+            // Trigger entrance animation
+            setTimeout(() => {
+                loadingMessage.style.opacity = '1';
+                loadingMessage.style.transform = 'translateY(0) scale(1)';
+            }, 100);
+            
+            // Initialize session
+            initializeSession();
+            
+            // Remove loading state after initialization with enhanced transitions
+            setTimeout(() => {
+                chatContainer.style.opacity = '1';
+                
+                // Add enhanced exit animation for loading message with slide and fade effect
+                loadingMessage.style.opacity = '0';
+                loadingMessage.style.transform = 'translateY(-30px) scale(0.95)';
+                loadingMessage.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                
+                // Remove loading message after animation
+                setTimeout(() => {
+                    loadingMessage.remove();
+                    
+                    // Add welcome message with better styling, helpful tips, enhanced entrance animation, and improved UX
+                    const welcomeMessage = document.createElement('div');
+                    welcomeMessage.className = 'message bot';
+                    welcomeMessage.innerHTML = `
+                        <div style="text-align: center;">
+                            <span style="font-size: 1.3rem; font-weight: 600;">Hello! I'm your AI assistant. How can I help you today? 😊</span><br>
+                            <small style="opacity: 0.7; color: #666;">You can type your message below or use the quick action buttons on the left</small><br>
+                            <small style="opacity: 0.5; color: #666;">I'm here to help with any questions or issues you might have</small><br>
+                            <div style="margin-top: 15px; padding: 10px 20px; background: rgba(0,123,255,0.1); border-radius: 15px; display: inline-block;">
+                                <small style="opacity: 0.8; color: #007bff;">
+                                    💡 <strong>Tip:</strong> Try asking me about billing, technical issues, or general support questions
+                                </small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add enhanced entrance animation for welcome message with slide and bounce effect
+                    welcomeMessage.style.opacity = '0';
+                    welcomeMessage.style.transform = 'translateY(30px) scale(0.95)';
+                    welcomeMessage.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    
+                    messagesContainer.appendChild(welcomeMessage);
+                    
+                    // Trigger entrance animation
+                    setTimeout(() => {
+                        welcomeMessage.style.opacity = '1';
+                        welcomeMessage.style.transform = 'translateY(0) scale(1)';
+                    }, 100);
+                }, 600);
+            }, 2000);
+        });
         
         // Test basic JavaScript functionality
         console.log('JavaScript loaded successfully');
@@ -671,8 +1441,57 @@
             messages: document.getElementById('messages')
         });
         
-        // Auto-focus input
-        document.getElementById('messageInput').focus();
+        // Auto-focus input with loading state
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.querySelector('.chat-input button');
+            
+            // Show loading state on input and button with enhanced styling
+            messageInput.placeholder = 'Initializing chat system...';
+            messageInput.disabled = true;
+            messageInput.style.opacity = '0.6';
+            messageInput.style.cursor = 'not-allowed';
+            messageInput.style.transition = 'all 0.3s ease';
+            
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            sendButton.style.opacity = '0.6';
+            sendButton.style.cursor = 'not-allowed';
+            sendButton.style.transition = 'all 0.3s ease';
+            
+            // Wait for session to be ready
+            const checkSession = setInterval(() => {
+                if (sessionId) {
+                    messageInput.placeholder = 'Type your message here...';
+                    messageInput.disabled = false;
+                    messageInput.style.opacity = '1';
+                    messageInput.style.cursor = 'text';
+                    messageInput.focus();
+                    
+                    sendButton.disabled = false;
+                    sendButton.innerHTML = '➤';
+                    sendButton.style.opacity = '1';
+                    sendButton.style.cursor = 'pointer';
+                    
+                    // Add enhanced success animation with bounce and glow effect
+                    messageInput.style.transform = 'scale(1.02)';
+                    messageInput.style.boxShadow = '0 0 15px rgba(0, 123, 255, 0.3)';
+                    
+                    sendButton.style.transform = 'scale(1.05)';
+                    sendButton.style.boxShadow = '0 0 15px rgba(0, 123, 255, 0.3)';
+                    
+                    setTimeout(() => {
+                        messageInput.style.transform = 'scale(1)';
+                        messageInput.style.boxShadow = 'none';
+                        
+                        sendButton.style.transform = 'scale(1)';
+                        sendButton.style.boxShadow = 'none';
+                    }, 300);
+                    
+                    clearInterval(checkSession);
+                }
+            }, 100);
+        });
         
         // Add click event listener to send button as backup
         document.querySelector('.chat-input button').addEventListener('click', function() {
@@ -683,7 +1502,20 @@
         // Handle page visibility changes
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && !isConnected && socket) {
+                // Show reconnecting state
+                const statusIndicator = document.getElementById('statusIndicator');
+                statusIndicator.style.background = '#ffc107'; // Yellow for reconnecting
+                
                 socket.connect();
+                
+                // Update status after reconnection
+                setTimeout(() => {
+                    if (isConnected) {
+                        statusIndicator.style.background = '#28a745'; // Green for connected
+                    } else {
+                        statusIndicator.style.background = '#dc3545'; // Red for error
+                    }
+                }, 3000);
             }
         });
         
@@ -723,6 +1555,66 @@
                 return null;
             }
         };
+        
+        // Feedback Management Functions
+        function showFeedbackInterface() {
+            const feedbackInterface = document.getElementById('feedbackInterface');
+            feedbackInterface.style.display = 'block';
+        }
+        
+        function hideFeedbackInterface() {
+            const feedbackInterface = document.getElementById('feedbackInterface');
+            feedbackInterface.style.display = 'none';
+        }
+        
+        async function submitFeedback() {
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const feedbackType = document.getElementById('feedbackType').value;
+            const comment = document.getElementById('feedbackComment').value;
+            
+            if (!rating) {
+                alert('Please select a rating before submitting feedback.');
+                return;
+            }
+            
+            try {
+                const feedbackResponse = await fetch('/api/agent/feedback', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        agent_id: 'current_agent',
+                        rating: parseInt(rating.value),
+                        comment: comment,
+                        feedback_type: feedbackType
+                    })
+                });
+                
+                if (feedbackResponse.ok) {
+                    showFeedbackSuccess();
+                } else {
+                    throw new Error('Failed to submit feedback');
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+                alert('Failed to submit feedback: ' + error.message);
+            }
+        }
+        
+        function showFeedbackSuccess() {
+            const feedbackInterface = document.getElementById('feedbackInterface');
+            feedbackInterface.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 3rem; color: #28a745; margin-bottom: 15px;">✅</div>
+                    <h3 style="color: #28a745; margin-bottom: 10px;">Thank You!</h3>
+                    <p style="color: #666;">Your feedback has been submitted successfully.</p>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                hideFeedbackInterface();
+            }, 5000);
+        }
     </script>
 </body>
 </html>
